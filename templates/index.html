@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support Ticket System</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem 0;
+      margin-bottom: 2rem;
+    }
+    .main-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+    .card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      margin-bottom: 2rem;
+      background: rgba(255, 255, 255, 0.95);
+    }
+    .card-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 15px 15px 0 0 !important;
+      padding: 1.25rem;
+      font-weight: 600;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      padding: 0.5rem 1.5rem;
+      font-weight: 500;
+      transition: transform 0.2s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    .table thead th {
+      background: #f8f9fa;
+      color: #495057;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #dee2e6;
+    }
+    .table-hover tbody tr:hover {
+      background-color: #f1f3f5;
+      cursor: pointer;
+    }
+    .status-badge {
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    .status-open { background: #ffc107; color: #000; }
+    .status-in_progress { background: #0dcaf0; color: #000; }
+    .status-waiting_customer { background: #fd7e14; color: #fff; }
+    .status-resolved { background: #198754; color: #fff; }
+    .status-closed { background: #6c757d; color: #fff; }
+    .alert {
+      border-radius: 10px;
+      border: none;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #6c757d;
+    }
+    .empty-state i {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    .message-item {
+      border-left: 3px solid #667eea;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: #f8f9fa;
+      border-radius: 5px;
+    }
+    .message-author {
+      font-weight: 600;
+      color: #667eea;
+    }
+    .message-time {
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+    .modal-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    .btn-sm {
+      padding: 0.25rem 0.75rem;
+      font-size: 0.875rem;
+    }
+    .filter-section {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="main-container">
+      <h1 class="mb-0">
+        <i class="fas fa-ticket-alt text-primary me-2"></i>
+        Support Ticket System
+      </h1>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="main-container">
+    <!-- Create Ticket Card -->
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-plus-circle me-2"></i>
+        Create New Ticket
+      </div>
+      <div class="card-body">
+        <p class="text-muted mb-3">
+          <i class="fas fa-info-circle me-1"></i>
+          Create a support ticket by providing a title and initial message.
+        </p>
+        
+        <form id="ticket-form">
+          <div class="mb-3">
+            <label for="title" class="form-label fw-semibold">Ticket Title</label>
+            <input 
+              type="text" 
+              class="form-control form-control-lg" 
+              id="title" 
+              name="title" 
+              placeholder="Brief description of the issue" 
+              required
+              maxlength="255"
+            >
+          </div>
+          <div class="mb-3">
+            <label for="message" class="form-label fw-semibold">Message</label>
+            <textarea 
+              class="form-control" 
+              id="message" 
+              name="message" 
+              rows="4" 
+              placeholder="Describe your issue in detail..." 
+              required
+            ></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg">
+            <i class="fas fa-paper-plane me-2"></i>
+            Create Ticket
+          </button>
+        </form>
+        
+        <!-- Alert Message -->
+        <div id="alertContainer" class="mt-3"></div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-section">
+      <div class="row align-items-center">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold mb-1">Filter by Status</label>
+          <select class="form-select" id="statusFilter">
+            <option value="">All Statuses</option>
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="waiting_customer">Waiting Customer</option>
+            <option value="resolved">Resolved</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold mb-1">Filter by User</label>
+          <select class="form-select" id="userFilter">
+            <option value="">All Users</option>
+          </select>
+        </div>
+        <div class="col-md-4 text-end">
+          <label class="form-label fw-semibold mb-1">&nbsp;</label>
+          <button class="btn btn-secondary d-block w-100" onclick="clearFilters()">
+            <i class="fas fa-redo me-2"></i>Clear Filters
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tickets Table Card -->
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>
+          <i class="fas fa-list me-2"></i>
+          All Tickets
+        </span>
+        <span class="badge bg-light text-dark" id="ticketCount">0 tickets</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th><i class="fas fa-hashtag me-1"></i> ID</th>
+                <th><i class="fas fa-heading me-1"></i> Title</th>
+                <th><i class="fas fa-info-circle me-1"></i> Status</th>
+                <th><i class="fas fa-user me-1"></i> Created By</th>
+                <th><i class="fas fa-comments me-1"></i> Messages</th>
+                <th><i class="fas fa-clock me-1"></i> Created</th>
+                <th class="text-center"><i class="fas fa-cog me-1"></i> Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tickets-body">
+              <!-- Will be populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <i class="fas fa-inbox"></i>
+          <h5>No tickets found</h5>
+          <p class="text-muted">Create your first ticket using the form above</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ticket Detail Modal -->
+  <div class="modal fade" id="ticketModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fas fa-ticket-alt me-2"></i>
+            Ticket #<span id="modalTicketId"></span>: <span id="modalTicketTitle"></span>
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Ticket Info -->
+          <div class="mb-3">
+            <strong>Status:</strong> <span id="modalTicketStatus" class="status-badge"></span>
+            <button class="btn btn-sm btn-outline-primary ms-2" onclick="showStatusChange()">
+              <i class="fas fa-edit"></i> Change Status
+            </button>
+          </div>
+          <div class="mb-3">
+            <strong>Created by:</strong> <span id="modalTicketCreator"></span>
+          </div>
+          <div class="mb-3">
+            <strong>Created at:</strong> <span id="modalTicketCreated"></span>
+          </div>
+          
+          <!-- Status Change Form (hidden by default) -->
+          <div id="statusChangeForm" class="mb-3" style="display: none;">
+            <div class="input-group">
+              <select class="form-select" id="newStatus">
+                <option value="open">Open</option>
+                <option value="in_progress">In Progress</option>
+                <option value="waiting_customer">Waiting Customer</option>
+                <option value="resolved">Resolved</option>
+                <option value="closed">Closed</option>
+              </select>
+              <button class="btn btn-primary" onclick="updateStatus()">
+                <i class="fas fa-check"></i> Update
+              </button>
+              <button class="btn btn-secondary" onclick="hideStatusChange()">
+                <i class="fas fa-times"></i> Cancel
+              </button>
+            </div>
+          </div>
+          
+          <hr>
+          
+          <!-- Messages -->
+          <h6 class="fw-bold mb-3"><i class="fas fa-comments me-2"></i>Conversation</h6>
+          <div id="messagesContainer">
+            <!-- Messages will be loaded here -->
+          </div>
+          
+          <!-- Add Message Form -->
+          <form id="message-form" class="mt-3">
+            <div class="mb-2">
+              <label class="form-label fw-semibold">Add a Message</label>
+              <textarea 
+                class="form-control" 
+                id="newMessage" 
+                rows="3" 
+                placeholder="Type your message here..." 
+                required
+              ></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-paper-plane me-2"></i>
+              Send Message
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    const ticketForm = document.getElementById("ticket-form");
+    const messageForm = document.getElementById("message-form");
+    const alertContainer = document.getElementById("alertContainer");
+    const ticketsBody = document.getElementById("tickets-body");
+    const ticketCount = document.getElementById("ticketCount");
+    const emptyState = document.getElementById("emptyState");
+    const statusFilter = document.getElementById("statusFilter");
+    const userFilter = document.getElementById("userFilter");
+    
+    let currentTicketId = null;
+    let allTickets = [];
+
+    // Show alert message
+    function showAlert(message, type = "info") {
+      alertContainer.innerHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+          <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      `;
+      setTimeout(() => {
+        const alert = alertContainer.querySelector('.alert');
+        if (alert) {
+          const bsAlert = new bootstrap.Alert(alert);
+          bsAlert.close();
+        }
+      }, 5000);
+    }
+
+    // Format status for display
+    function formatStatus(status) {
+      const statusMap = {
+        'open': 'Open',
+        'in_progress': 'In Progress',
+        'waiting_customer': 'Waiting Customer',
+        'resolved': 'Resolved',
+        'closed': 'Closed'
+      };
+      return statusMap[status] || status;
+    }
+
+    // Load all tickets
+    async function loadTickets() {
+      try {
+        const statusVal = statusFilter.value;
+        const userVal = userFilter.value;
+        
+        let url = "/tickets";
+        const params = new URLSearchParams();
+        if (statusVal) params.append("status", statusVal);
+        if (userVal) params.append("user", userVal);
+        if (params.toString()) url += "?" + params.toString();
+        
+        const resp = await fetch(url);
+        const data = await resp.json();
+        
+        if (!resp.ok) {
+          showAlert("Error loading tickets: " + (data.error || resp.statusText), "danger");
+          return;
+        }
+        
+        allTickets = data;
+        
+        // Populate user filter
+        const users = [...new Set(data.map(t => t.created_by))].sort();
+        const currentUser = userFilter.value;
+        userFilter.innerHTML = '<option value="">All Users</option>' + 
+          users.map(u => `<option value="${u}" ${u === currentUser ? 'selected' : ''}>${u}</option>`).join('');
+        
+        ticketsBody.innerHTML = "";
+        
+        if (data.length === 0) {
+          emptyState.style.display = "block";
+          ticketCount.textContent = "0 tickets";
+          return;
+        }
+        
+        emptyState.style.display = "none";
+        ticketCount.textContent = `${data.length} ticket${data.length !== 1 ? 's' : ''}`;
+        
+        data.forEach((ticket) => {
+          const tr = document.createElement("tr");
+          const created = new Date(ticket.created_at).toLocaleString();
+          const statusClass = `status-${ticket.status}`;
+          
+          tr.innerHTML = `
+            <td><strong class="text-primary">#${ticket.ticket_id}</strong></td>
+            <td>${ticket.title}</td>
+            <td><span class="status-badge ${statusClass}">${formatStatus(ticket.status)}</span></td>
+            <td>${ticket.created_by}</td>
+            <td><span class="badge bg-secondary">${ticket.message_count}</span></td>
+            <td><small>${created}</small></td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-primary" onclick="viewTicket(${ticket.ticket_id})">
+                <i class="fas fa-eye"></i> View
+              </button>
+            </td>
+          `;
+          ticketsBody.appendChild(tr);
+        });
+      } catch (err) {
+        showAlert("Failed to load tickets: " + err, "danger");
+      }
+    }
+
+    // Create a new ticket
+    ticketForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const title = document.getElementById("title").value.trim();
+      const message = document.getElementById("message").value.trim();
+      const submitBtn = ticketForm.querySelector('button[type="submit"]');
+      
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
+
+      try {
+        const resp = await fetch("/tickets", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title, message }),
+        });
+        const data = await resp.json();
+        
+        if (!resp.ok) {
+          showAlert("Error: " + (data.error || resp.statusText), "danger");
+          return;
+        }
+        
+        showAlert(`✓ Ticket #${data.ticket_id} created successfully!`, "success");
+        document.getElementById("title").value = "";
+        document.getElementById("message").value = "";
+        loadTickets();
+      } catch (err) {
+        showAlert("Request failed: " + err, "danger");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Create Ticket';
+      }
+    });
+
+    // View ticket details
+    async function viewTicket(ticketId) {
+      currentTicketId = ticketId;
+      
+      try {
+        const resp = await fetch(`/tickets/${ticketId}`);
+        const data = await resp.json();
+        
+        if (!resp.ok) {
+          showAlert("Error loading ticket: " + (data.error || resp.statusText), "danger");
+          return;
+        }
+        
+        const ticket = data.ticket;
+        const messages = data.messages;
+        
+        document.getElementById("modalTicketId").textContent = ticket.ticket_id;
+        document.getElementById("modalTicketTitle").textContent = ticket.title;
+        document.getElementById("modalTicketStatus").textContent = formatStatus(ticket.status);
+        document.getElementById("modalTicketStatus").className = `status-badge status-${ticket.status}`;
+        document.getElementById("modalTicketCreator").textContent = ticket.created_by;
+        document.getElementById("modalTicketCreated").textContent = new Date(ticket.created_at).toLocaleString();
+        document.getElementById("newStatus").value = ticket.status;
+        
+        // Load messages
+        const container = document.getElementById("messagesContainer");
+        container.innerHTML = "";
+        
+        if (messages.length === 0) {
+          container.innerHTML = '<p class="text-muted">No messages yet.</p>';
+        } else {
+          messages.forEach(msg => {
+            const msgDiv = document.createElement("div");
+            msgDiv.className = "message-item";
+            msgDiv.innerHTML = `
+              <div class="d-flex justify-content-between">
+                <span class="message-author">${msg.author}</span>
+                <span class="message-time">${new Date(msg.created_at).toLocaleString()}</span>
+              </div>
+              <div class="mt-2">${msg.message_text}</div>
+            `;
+            container.appendChild(msgDiv);
+          });
+        }
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById("ticketModal"));
+        modal.show();
+      } catch (err) {
+        showAlert("Failed to load ticket details: " + err, "danger");
+      }
+    }
+
+    // Add message to ticket
+    messageForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const message = document.getElementById("newMessage").value.trim();
+      const submitBtn = messageForm.querySelector('button[type="submit"]');
+      
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+
+      try {
+        const resp = await fetch(`/tickets/${currentTicketId}/messages`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message }),
+        });
+        const data = await resp.json();
+        
+        if (!resp.ok) {
+          alert("Error: " + (data.error || resp.statusText));
+          return;
+        }
+        
+        document.getElementById("newMessage").value = "";
+        viewTicket(currentTicketId); // Reload ticket details
+        loadTickets(); // Refresh ticket list
+      } catch (err) {
+        alert("Request failed: " + err);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Send Message';
+      }
+    });
+
+    // Show/hide status change form
+    function showStatusChange() {
+      document.getElementById("statusChangeForm").style.display = "block";
+    }
+    
+    function hideStatusChange() {
+      document.getElementById("statusChangeForm").style.display = "none";
+    }
+
+    // Update ticket status
+    async function updateStatus() {
+      const newStatus = document.getElementById("newStatus").value;
+      
+      try {
+        const resp = await fetch(`/tickets/${currentTicketId}/status`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: newStatus }),
+        });
+        const data = await resp.json();
+        
+        if (!resp.ok) {
+          alert("Error: " + (data.error || resp.statusText));
+          return;
+        }
+        
+        hideStatusChange();
+        viewTicket(currentTicketId); // Reload ticket details
+        loadTickets(); // Refresh ticket list
+      } catch (err) {
+        alert("Request failed: " + err);
+      }
+    }
+
+    // Clear filters
+    function clearFilters() {
+      statusFilter.value = "";
+      userFilter.value = "";
+      loadTickets();
+    }
+
+    // Filter change handlers
+    statusFilter.addEventListener("change", loadTickets);
+    userFilter.addEventListener("change", loadTickets);
+
+    // Initial load
+    loadTickets();
+  </script>
+</body>
+</html>
